@@ -50,15 +50,15 @@ try:
             
             # 1. 右上の「日付」欄 (さらに右、さらに下へ)
             # 座標の重なりを回避
-            can1.drawString(505, 708, today_str) 
+            can1.drawString(505, 758, today_str) 
             
             # 2. 中段の「日付」欄 (座標付近の空白へ)
             # 総重量570の下ではなく、日付の文字の真横(y=458付近)へ
-            can1.drawString(505, 458, today_str) 
+            can1.drawString(505, 508, today_str) 
             
             # 【受領印の位置修正】
             # さらに左へ (465 -> 455)
-            stamp_x = 455  
+            stamp_x = 500  
             stamp_y = 168  
             
             can1.setStrokeColorRGB(0.8, 0, 0)
