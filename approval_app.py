@@ -7,61 +7,72 @@ from reportlab.pdfbase.ttfonts import TTFont
 import io
 import datetime
 import base64
+import urllib.request
+import os
 
 # ページ設定
-st.set_page_config(page_title="物品受領システム", layout="centered")
+st.set_page_config(page_title="物品受領承認依頼", layout="centered")
 
-st.title("📦 物品受領依頼")
+st.title("📦 物品受領承認依頼")
 st.write("納品内容をご確認のうえ、受領印を押してください。")
 
 file_path = "sample.pdf"
 
+# --- 日本語フォントのセットアップ（サーバー上での文字化け対策） ---
+@st.cache_resource
+def load_font():
+    font_url = "https://github.com/googlefonts/noto-cjk/raw/main/Sans/OTF/Japanese/NotoSansCJKjp-Regular.otf"
+    font_path = "NotoSansJP.otf"
+    if not os.path.exists(font_path):
+        urllib.request.urlretrieve(font_url, font_path)
+    pdfmetrics.registerFont(TTFont('NotoSansJP', font_path))
+    return 'NotoSansJP'
+
+FONT_NAME = load_font()
+
 def display_pdf(file_path):
-    """PDFを画面上にプレビュー表示する関数"""
+    """PDFをプレビュー表示（ブロック対策版）"""
     with open(file_path, "rb") as f:
         base64_pdf = base64.b64encode(f.read()).decode('utf-8')
-    pdf_display = f'<iframe src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf"></iframe>'
+    # Chromeのブロックを回避するためにiframeの書き方を調整
+    pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="100%" height="600" type="application/pdf">'
     st.markdown(pdf_display, unsafe_allow_html=True)
 
 try:
     # 1. 納品書のプレビュー表示
     st.subheader("📄 納品書プレビュー")
-    display_pdf(file_path)
+    if os.path.exists(file_path):
+        display_pdf(file_path)
+    else:
+        st.error("納品書ファイル(sample.pdf)が準備できていません。")
+    
     st.divider()
 
     # 2. 入力フォーム
-    recipient_name = st.text_input("受領者名を入力してください", placeholder="例：氏名")
+    recipient_name = st.text_input("受領者名を入力してください", placeholder="氏名")
     
     if st.button("🔴 受領ボタン（受領印を押す）"):
         if recipient_name and recipient_name != "氏名":
-            # 日本語フォントの読み込み
-            try:
-                pdfmetrics.registerFont(TTFont('JapaneseFont', 'C:/Windows/Fonts/msgothic.ttc'))
-                FONT_NAME = 'JapaneseFont'
-            except:
-                FONT_NAME = 'Helvetica'
-
             existing_pdf = PdfReader(open(file_path, "rb"))
             output = PdfWriter()
 
             packet = io.BytesIO()
             can = canvas.Canvas(packet, pagesize=A4)
             
-            # --- 印影デザイン（受領印を大きく・濃く調整） ---
-            # 前回の完璧な位置から少し左(x)・下(y)にずらして中央を調整
+            # --- 印影デザイン（大きく、はっきりと） ---
             stamp_x = 475  
             stamp_y = 175  
             
-            can.setLineWidth(2.5) # 線を太く
-            can.setStrokeColorRGB(0.9, 0, 0) # より鮮やかな赤
+            can.setLineWidth(2.5)
+            can.setStrokeColorRGB(0.9, 0, 0)
             can.setFillColorRGB(0.9, 0, 0)
             
-            # 円を大きく（半径28→35）
+            # 円（半径35：大きく調整）
             can.circle(stamp_x, stamp_y, 35, stroke=1, fill=0)
             can.line(stamp_x - 30, stamp_y + 10, stamp_x + 30, stamp_y + 10)
             can.line(stamp_x - 30, stamp_y - 10, stamp_x + 30, stamp_y - 10)
             
-            # 文字（サイズを大きく、太字に）
+            # 文字（NotoSansJPを使用）
             can.setFont(FONT_NAME, 11)
             can.drawCentredString(stamp_x, stamp_y + 18, "受領")
             
@@ -76,7 +87,6 @@ try:
             packet.seek(0)
             new_pdf = PdfReader(packet)
 
-            # 合成処理
             page = existing_pdf.pages[0]
             page.merge_page(new_pdf.pages[0])
             output.add_page(page)
@@ -88,10 +98,9 @@ try:
             output.write(output_pdf_data)
             output_pdf_data.seek(0)
 
-            # 3. 成功時のポップアップ表示
-            st.success("受領しました。") # 一時的なメッセージとして表示
+            # 3. 成功メッセージの表示
+            st.success("受領しました。")
             
-            # ダウンロードボタンの名称変更
             st.download_button(
                 label="📩 受領印書類をダウンロード",
                 data=output_pdf_data,
@@ -102,7 +111,5 @@ try:
         else:
             st.warning("受領者名を入力してください。")
 
-except FileNotFoundError:
-    st.error("納品書ファイル(sample.pdf)が見つかりません。")
 except Exception as e:
-    st.error(f"システムエラー: {e}")
+    st.error(f"システムエラーが発生しました: {e}")
