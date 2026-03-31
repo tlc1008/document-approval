@@ -52,7 +52,7 @@ try:
             
             # 【A. 3カ所の日付入力】文字サイズ9
             can1.setFont("Helvetica", 9)
-            can1.drawString(500, 782, today_str) # 右上の「日付」
+            can1.drawString(500, 786, today_str) # 右上の「日付」
             can1.drawString(500, 335, today_str) # 中段の「日付」
             
             # 【B. 印影のデザインと位置】
@@ -102,7 +102,7 @@ try:
                 
                 # 2ページ目の日付
                 can2.setFont("Helvetica", 9)
-                can2.drawString(500, 730, today_str) 
+                can2.drawString(500, 740, today_str) 
                 
                 can2.save()
                 packet2.seek(0)
