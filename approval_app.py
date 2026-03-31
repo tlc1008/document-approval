@@ -90,7 +90,7 @@ try:
                 
                 # 3. 2ページ目「日付」欄 (座標付近)
                 can2.setFont("Helvetica", 9)
-                can2.drawString(500, 690, today_str) 
+                can2.drawString(500, 715, today_str) 
                 
                 can2.save()
                 packet2.seek(0)
