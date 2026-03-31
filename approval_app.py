@@ -58,7 +58,7 @@ try:
             # 【B. 印影のデザインと位置】
             # 千葉様が調整された「455, 188」付近に設定しています
             stamp_x = 500  
-            stamp_y = 168  
+            stamp_y = 190  
             
             can1.setStrokeColorRGB(0.8, 0, 0) # 印影の赤色
             can1.setFillColorRGB(0.8, 0, 0)
