@@ -8,7 +8,6 @@ import io
 import datetime
 import os
 
-# ページ設定
 st.set_page_config(page_title="物品受領承認依頼", layout="centered")
 
 st.title("📦 物品受領承認依頼")
@@ -21,7 +20,6 @@ FONT_NAME = 'HeiseiMin-W3'
 pdfmetrics.registerFont(UnicodeCIDFont(FONT_NAME))
 
 try:
-    # 1. 書類確認
     st.subheader("📄 納品書の確認")
     if os.path.exists(file_path):
         with open(file_path, "rb") as f:
@@ -34,29 +32,29 @@ try:
     
     st.divider()
 
-    # 2. 受領者入力
     recipient_name = st.text_input("受領者名を入力してください", placeholder="氏名を入力")
     
     if st.button("🔴 受領ボタン（受領印を押す）"):
         if recipient_name and recipient_name != "氏名を入力":
             existing_pdf = PdfReader(open(file_path, "rb"))
             output = PdfWriter()
-
-            # 今日のお日付 (西暦表示)
             today_str = datetime.date.today().strftime("%Y/%m/%d")
 
-            # --- 1ページ目の合成処理 ---
+            # --- 1ページ目の合成 ---
             packet1 = io.BytesIO()
             can1 = canvas.Canvas(packet1, pagesize=A4)
             
-            # A. 3カ所の日付入力 (座標はアップロードされたPDFを元に推測)
+            # 【日付位置の修正】
             can1.setFont("Helvetica", 10)
-            can1.drawString(450, 728, today_str) # 1カ所目: 右上付近 
-            can1.drawString(450, 485, today_str) # 2カ所目: 中段右付近 
+            # 1. 右上の「日付」欄 (以前より下げて右へ調整)
+            can1.drawString(485, 715, today_str) 
+            # 2. 中段の「日付」欄 (受領書セクションの空白へ)
+            can1.drawString(485, 470, today_str) 
             
-            # B. 受領印の設定 (さらに左へ移動: 525 -> 475)
-            stamp_x = 475  
-            stamp_y = 175  
+            # 【受領印の位置修正】
+            # さらに左、少し下へ調整 (475 -> 465)
+            stamp_x = 465  
+            stamp_y = 168  
             
             can1.setStrokeColorRGB(0.8, 0, 0)
             can1.setFillColorRGB(0.8, 0, 0)
@@ -76,19 +74,18 @@ try:
             can1.save()
             packet1.seek(0)
             
-            # 1ページ目に合成
             page1 = existing_pdf.pages[0]
             page1.merge_page(PdfReader(packet1).pages[0])
             output.add_page(page1)
 
-            # --- 2ページ目の合成処理 ---
+            # --- 2ページ目の合成 ---
             if len(existing_pdf.pages) > 1:
                 packet2 = io.BytesIO()
                 can2 = canvas.Canvas(packet2, pagesize=A4)
                 
-                # 3カ所目の日付 (2ページ目)
+                # 3. 2ページ目「送り状」の日付欄 (位置を微調整)
                 can2.setFont("Helvetica", 10)
-                can2.drawString(480, 685, today_str) # 2ページ目の日付欄 
+                can2.drawString(485, 672, today_str) 
                 
                 can2.save()
                 packet2.seek(0)
@@ -97,7 +94,6 @@ try:
                 page2.merge_page(PdfReader(packet2).pages[0])
                 output.add_page(page2)
 
-            # 残りのページがあれば追加
             for i in range(2, len(existing_pdf.pages)):
                 output.add_page(existing_pdf.pages[i])
 
@@ -105,7 +101,7 @@ try:
             output.write(output_pdf_data)
             output_pdf_data.seek(0)
 
-            st.success(f"受領処理が完了しました（日付: {today_str}）")
+            st.success(f"受領処理が完了しました")
             
             st.download_button(
                 label="📩 受領印書類をダウンロード",
@@ -117,4 +113,4 @@ try:
             st.warning("受領者名を入力してください。")
 
 except Exception as e:
-    st.error("エラーが発生しました。ファイル名を確認してください。")
+    st.error("エラーが発生しました。")
