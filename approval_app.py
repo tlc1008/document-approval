@@ -52,11 +52,11 @@ try:
             
             # 【A. 3カ所の日付入力】文字サイズ9
             can1.setFont("Helvetica", 9)
-            can1.drawString(500, 792, today_str) # 右上の「日付」
+            can1.drawString(500, 793, today_str) # 右上の「日付」
             can1.drawString(500, 335, today_str) # 中段の「日付」
             
             # 【B. 印影のデザインと位置】
-            # 千葉様が調整された「455, 168」付近に設定しています
+            # 千葉様が調整された「455, 188」付近に設定しています
             stamp_x = 500  
             stamp_y = 168  
             
