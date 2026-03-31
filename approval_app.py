@@ -44,16 +44,21 @@ try:
             packet1 = io.BytesIO()
             can1 = canvas.Canvas(packet1, pagesize=A4)
             
-            # 【日付位置の修正】
-            can1.setFont("Helvetica", 10)
-            # 1. 右上の「日付」欄 (以前より下げて右へ調整)
-            can1.drawString(485, 715, today_str) 
-            # 2. 中段の「日付」欄 (受領書セクションの空白へ)
-            can1.drawString(485, 470, today_str) 
+            # 【日付位置の再修正】
+            # 文字サイズを9に下げて、より正確な位置へ
+            can1.setFont("Helvetica", 9)
+            
+            # 1. 右上の「日付」欄 (さらに右、さらに下へ)
+            # 座標の重なりを回避
+            can1.drawString(505, 708, today_str) 
+            
+            # 2. 中段の「日付」欄 (座標付近の空白へ)
+            # 総重量570の下ではなく、日付の文字の真横(y=458付近)へ
+            can1.drawString(505, 458, today_str) 
             
             # 【受領印の位置修正】
-            # さらに左、少し下へ調整 (475 -> 465)
-            stamp_x = 465  
+            # さらに左へ (465 -> 455)
+            stamp_x = 455  
             stamp_y = 168  
             
             can1.setStrokeColorRGB(0.8, 0, 0)
@@ -83,9 +88,9 @@ try:
                 packet2 = io.BytesIO()
                 can2 = canvas.Canvas(packet2, pagesize=A4)
                 
-                # 3. 2ページ目「送り状」の日付欄 (位置を微調整)
-                can2.setFont("Helvetica", 10)
-                can2.drawString(485, 672, today_str) 
+                # 3. 2ページ目「日付」欄 (座標付近)
+                can2.setFont("Helvetica", 9)
+                can2.drawString(505, 665, today_str) 
                 
                 can2.save()
                 packet2.seek(0)
