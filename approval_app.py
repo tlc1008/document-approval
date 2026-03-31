@@ -50,11 +50,11 @@ try:
             
             # 1. 右上の「日付」欄 (さらに右、さらに下へ)
             # 座標の重なりを回避
-            can1.drawString(505, 790, today_str) 
+            can1.drawString(500, 793, today_str) 
             
             # 2. 中段の「日付」欄 (座標付近の空白へ)
             # 総重量570の下ではなく、日付の文字の真横(y=458付近)へ
-            can1.drawString(505, 400, today_str) 
+            can1.drawString(505, 380, today_str) 
             
             # 【受領印の位置修正】
             # さらに左へ (465 -> 455)
@@ -90,7 +90,7 @@ try:
                 
                 # 3. 2ページ目「日付」欄 (座標付近)
                 can2.setFont("Helvetica", 9)
-                can2.drawString(505, 695, today_str) 
+                can2.drawString(505, 725, today_str) 
                 
                 can2.save()
                 packet2.seek(0)
