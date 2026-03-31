@@ -52,12 +52,12 @@ try:
             
             # 【A. 3カ所の日付入力】文字サイズ9
             can1.setFont("Helvetica", 9)
-            can1.drawString(505, 708, today_str) # 右上の「日付」
-            can1.drawString(505, 458, today_str) # 中段の「日付」
+            can1.drawString(500, 750, today_str) # 右上の「日付」
+            can1.drawString(500, 350, today_str) # 中段の「日付」
             
             # 【B. 印影のデザインと位置】
             # 千葉様が調整された「455, 168」付近に設定しています
-            stamp_x = 455  
+            stamp_x = 500  
             stamp_y = 168  
             
             can1.setStrokeColorRGB(0.8, 0, 0) # 印影の赤色
@@ -102,7 +102,7 @@ try:
                 
                 # 2ページ目の日付
                 can2.setFont("Helvetica", 9)
-                can2.drawString(505, 665, today_str) 
+                can2.drawString(500, 685, today_str) 
                 
                 can2.save()
                 packet2.seek(0)
